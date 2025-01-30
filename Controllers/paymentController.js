@@ -1,5 +1,5 @@
 const bcrypt = require('bcrypt');
-const dbPool = require('./dbPool')
+const dbPool = require('./dbPool');
 
 const addUserPayment = async (req, res)=>{
     try{
