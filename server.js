@@ -8,6 +8,7 @@ const bodyParser = require('body-parser');
 
 const userRouter = require('./Routes/userRoutes')
 const stockScreenerRouter = require('./Routes/stockScreenerRoute')
+const dbPool = require('./Controllers/dbPool')
 
 const app= express()
 
@@ -37,11 +38,11 @@ app.use('/users', userRouter)
 
 app.get('/api/plans', async (req, res)=>{
     try{
-        if (!dbConnection){
+        if (!dbPool){
             return res.status(500).json({ error: 'Database connection is not established' });
         }
         const selectQuery = 'SELECT * FROM subscription_plan';
-        const [plans] = await dbConnection.query(selectQuery); 
+        const [plans] = await dbPool.query(selectQuery); 
         res.json(plans);
     }catch(error){
         console.error('Error fetching users:', error);
@@ -55,11 +56,11 @@ app.use('/stocksScreener', stockScreenerRouter)
 
 app.get('/api/userpayment', async (req, res)=>{
     try{
-        if (!dbConnection){
+        if (!dbPool){
             return res.status(500).json({ error: 'Database connection is not established' });
         }
         const selectQuery = 'SELECT * FROM user_payment_details';
-        const [users] = await dbConnection.query(selectQuery); 
+        const [users] = await dbPool.query(selectQuery); 
         res.json(users);
     }catch(error){
         console.error('Error fetching users:', error);
@@ -69,11 +70,11 @@ app.get('/api/userpayment', async (req, res)=>{
 
 app.get('/api/stocks', async (req, res)=>{
     try{
-        if (!dbConnection){
+        if (!dbPool){
             return res.status(500).json({error: 'Database connection is not established'})
         }
         const stocksQuery=`select * from stocks;`;
-        const [stocks] = await dbConnection.query(stocksQuery)
+        const [stocks] = await dbPool.query(stocksQuery)
         res.status(200).json(stocks);
     }catch(e){
         console.error('Error fetching users:', e);
@@ -83,11 +84,25 @@ app.get('/api/stocks', async (req, res)=>{
 
 app.get('/api/compstock', async (req, res)=>{
     try{
-        if (!dbConnection){
+        if (!dbPool){
             return res.status(500).json({error: 'Database connection is not established'})
         }
         const stockslistQuery=`select * from comapanies_stocks_list;`;
-        const [stockslist] = await dbConnection.query(stockslistQuery)
+        const [stockslist] = await dbPool.query(stockslistQuery)
+        res.status(200).json(stockslist);
+    }catch(e){
+        console.error('Error fetching users:', e);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+})
+
+app.get('/api/nifty100', async (req, res)=>{
+    try{
+        if (!dbPool){
+            return res.status(500).json({error: 'Database connection is not established'})
+        }
+        const stockslistQuery=`select * from comapanies_stocks_list where NIFTY_100 != '-' limit 41;`;
+        const [stockslist] = await dbPool.query(stockslistQuery)
         res.status(200).json(stockslist);
     }catch(e){
         console.error('Error fetching users:', e);
@@ -97,11 +112,11 @@ app.get('/api/compstock', async (req, res)=>{
 
 app.get('/api/nifty500', async (req, res)=>{
     try{
-        if (!dbConnection){
+        if (!dbPool){
             return res.status(500).json({error: 'Database connection is not established'})
         }
         const niftyQuery=`select * from Nifty500_Company_List;`;
-        const [nifty500] = await dbConnection.query(niftyQuery)
+        const [nifty500] = await dbPool.query(niftyQuery)
         res.status(200).json(nifty500);
     }catch(e){
         console.error('Error fetching users:', e);
